@@ -21,10 +21,12 @@ type Gem struct {
 func (g *Gem) Init() {
 	ctx := context.Background()
 
-	apiKey, ok := os.LookupEnv("GEMINI_API_KEY")
-	if !ok {
-		log.Fatalln("Environment variable GEMINI_API_KEY not set")
-	}
+	// apiKey, ok := os.LookupEnv("GEMINI_API_KEY")
+	apiKey := os.Getenv("GEMINI_API_KEY")
+
+	// if !ok {
+	// 	log.Fatalln("Environment variable GEMINI_API_KEY not set")
+	// }
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
