@@ -122,14 +122,21 @@ func (g *Gem) SetSession(parts []genai.Part) {
 	}
 
 }
+func (g *Gem) SetSessionSimple() {
+	session := g.Model.StartChat()
+	g.Session = session
+	g.Session.History = []*genai.Content{}
+
+}
 
 func (g *Gem) SendRequest(ctx context.Context, prompt string) []genai.Part {
-	log.Println(prompt)
+	log.Println("prompt", prompt)
 	resp, err := g.Session.SendMessage(ctx, genai.Text(prompt))
 	if err != nil {
-		log.Println("Error sending message: %v", err.Error())
+		log.Println("Error sending message", err)
 		panic(err)
 	}
+	log.Println("resp", resp)
 	for _, part := range resp.Candidates[0].Content.Parts {
 		fmt.Printf("%v\n", part)
 	}

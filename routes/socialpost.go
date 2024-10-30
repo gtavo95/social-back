@@ -67,6 +67,9 @@ func SocialPostText(c *fiber.Ctx) error {
 
 		}
 		gem.SetSession(genPars)
+	} else {
+		gem.SetSessionSimple()
+
 	}
 
 	// generate parts
