@@ -1,21 +1,18 @@
-FROM golang:1.22rc1-bullseye AS build
+# Use an official Golang runtime as a base image
+FROM golang:alpine
 
-WORKDIR /app 
+# Set the working directory inside the container
+WORKDIR /app
 
-COPY go.mod go.sum ./
-
-RUN go mod download
-
+# Copy the local source code to the container's working directory
 COPY . .
 
-RUN go build \
-  -ldflags="-linkmode external -extldflags -static" \
-  -tags netgo \
-  -o meeting-server
+# Build the Go application
+RUN go build -o app
 
-FROM scratch
+# Expose the port that the application listens on (replace 8080 with the actual port your application listens on)
+EXPOSE 3000
+EXPOSE 19783
 
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /app/main main
-
-CMD ["/main"]
+# Command to run the application when the container starts
+CMD ["./app"]
