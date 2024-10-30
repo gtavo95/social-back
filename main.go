@@ -27,5 +27,5 @@ func main() {
 	// app.Post("/image", routes.CreateImages)
 	// app.Get("/image", routes.CreateImages)
 
-	log.Fatal(app.Listen(":8080"))
+	app.Listen(":8080")
 }
