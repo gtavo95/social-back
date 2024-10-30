@@ -30,7 +30,6 @@ func (bf *BlackForest) Init() {
 
 	// API key from environment variable
 	bf.ApiKey = os.Getenv("BFL_API_KEY")
-	//bf.ApiKey = "83fd74e4-5612-4430-9b16-cc430a4473d8"
 
 }
 
