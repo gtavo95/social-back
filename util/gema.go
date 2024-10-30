@@ -23,6 +23,7 @@ func (g *Gem) Init() {
 
 	// apiKey, ok := os.LookupEnv("GEMINI_API_KEY")
 	apiKey := os.Getenv("GEMINI_API_KEY")
+	log.Println("apikey", apiKey)
 
 	// if !ok {
 	// 	log.Fatalln("Environment variable GEMINI_API_KEY not set")
@@ -123,9 +124,11 @@ func (g *Gem) SetSession(parts []genai.Part) {
 }
 
 func (g *Gem) SendRequest(ctx context.Context, prompt string) []genai.Part {
+	log.Println(prompt)
 	resp, err := g.Session.SendMessage(ctx, genai.Text(prompt))
 	if err != nil {
-		log.Fatalf("Error sending message: %v", err)
+		log.Println("Error sending message: %v", err.Error())
+		panic(err)
 	}
 	for _, part := range resp.Candidates[0].Content.Parts {
 		fmt.Printf("%v\n", part)
