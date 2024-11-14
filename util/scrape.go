@@ -1,0 +1,110 @@
+package util
+
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+)
+
+func encode_url(baseURL string) string {
+	// Parse the URL
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		fmt.Println("Error parsing URL:", err)
+	}
+
+	// Print the full URL with query parameters
+	fmt.Println("Full URL:", u.String())
+
+	return u.String()
+
+}
+
+func scrape_url(baseURL string) interface{} {
+
+	// Create client
+	client := &http.Client{}
+
+	encoded_url := encode_url(baseURL)
+
+	fmt.Println("URL CODIFICADA:", encoded_url)
+
+	// Create request
+	req, err := http.NewRequest("GET", "https://app.scrapingbee.com/api/v1/?api_key=CLDW8SV4VVM4AFW82355BQ9PV8AZSR3G33ZQ2BTQFO8QIAPZEVJRKWDOLNGNRLJBCMEVLZG8Z32HC4LR&url="+encoded_url+"&json_response=true", nil)
+
+	parseFormErr := req.ParseForm()
+	if parseFormErr != nil {
+		fmt.Println(parseFormErr)
+	}
+
+	// Fetch Request
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("Failure : ", err)
+	}
+
+	// Read Response Body
+	respBody, err := ioutil.ReadAll(resp.Body)
+
+	// Unmarshal the JSON response
+	var responseData map[string]interface{}
+
+	if err := json.Unmarshal(respBody, &responseData); err != nil {
+		fmt.Println("Error parsing JSON:", err)
+
+	}
+
+	var description, logo string
+
+	if metadata, ok := responseData["metadata"].(map[string]interface{}); ok {
+
+		// Check if "opengraph" exists and is a non-empty list
+		if opengraph, ok := metadata["opengraph"].([]interface{}); ok && len(opengraph) > 0 {
+			// Get the first element as a map
+			if firstOpengraph, ok := opengraph[0].(map[string]interface{}); ok {
+				// Check for "og:description" and save it if exists
+				if desc, ok := firstOpengraph["og:description"].(string); ok {
+					description = desc
+				}
+				// Check for "og:image" and save it as logo if exists
+				if img, ok := firstOpengraph["og:image"].(string); ok {
+					logo = img
+				}
+			}
+		} else if dublincore, ok := metadata["dublincore"].([]interface{}); ok && len(dublincore) > 0 {
+			// Loop through each element in "dublincore"
+			for _, dc := range dublincore {
+				// Check if each element is a map
+				if dcMap, ok := dc.(map[string]interface{}); ok {
+					// Check for "elements" key, which should be a list
+					if elements, ok := dcMap["elements"].([]interface{}); ok && len(elements) > 0 {
+						for _, element := range elements {
+							// Each element should be a map, so assert it as a map
+							if elemMap, ok := element.(map[string]interface{}); ok {
+								// Look for "name" == "description" and retrieve "content"
+								if name, ok := elemMap["name"].(string); ok && name == "description" {
+									if content, ok := elemMap["content"].(string); ok {
+										description = content
+										break // Exit loop once description is found
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	response := map[string]interface{}{
+		"description": description,
+		"logo":        logo,
+	}
+
+	// Send the response as JSON
+	return response
+
+}
