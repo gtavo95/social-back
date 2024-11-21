@@ -36,7 +36,7 @@ func (bf *BlackForest) SetPrompt(prompt string, reference string) {
 	// Define the request payload
 	bf.Prompt = map[string]interface{}{
 		// "prompt": "A cat on its back legs running like a human is holding a big silver fish with its arms. The cat is running away from the shop owner and has a panicked look on his face. The scene is situated in a crowded market.",
-		"prompt": prompt + " " + reference + " Do not include text on the image",
+		"prompt": reference + "No text",
 		"width":  1024,
 		"height": 768,
 	}

@@ -81,7 +81,7 @@ func (g *Gem) CreateSystemStruction(params model.Params, identity string) string
 		withContext = "To do this, use the identity of the company and the context of the brand" + identity
 	}
 
-	instruction := fmt.Sprintf("You are a creative assistant, who seeks to guide and help a marketer to create content on %s. Generate markdown instruction with exactly %d words, including %s hashtags and %s relevant emojis. Ensure the tone is %s. %s. Provide %s options. The answer in Json format [{caption: '', caption: '', ...}]",
+	instruction := fmt.Sprintf("You are a creative assistant, who seeks to guide and help a marketer to create content on %s. Generate markdown instruction with exactly %d words, including %s hashtags and %s relevant emojis. Ensure the tone is %s. %s. Provide %s options. The answer in Json format [{caption: '', caption: '', ...}]. include the next url in the caption text http://localhost:3000/honey/90140547",
 		params.Network, params.Words, withHashtags, withEmojis, params.Tone, withContext, params.Post)
 
 	return instruction
