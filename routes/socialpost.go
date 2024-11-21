@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"social/model"
 	"social/util"
 	"strconv"
@@ -22,6 +21,30 @@ func partsToStrings(parts []genai.Part) string {
 	return result
 }
 
+// Define the struct to represent each promotion
+type Promotion struct {
+	Caption string `json:"caption"`
+}
+
+func CaptionStruct(data []genai.Part) []Promotion {
+	// Variable to hold the parsed data
+	var promotions []Promotion
+
+	var captions string
+	for _, part := range data {
+		captions = fmt.Sprintf("%s", part)
+	}
+
+	// // Parse the JSON
+	err := json.Unmarshal([]byte(captions), &promotions)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		panic(err)
+	}
+
+	return promotions
+}
+
 func SocialPostText(c *fiber.Ctx) error {
 
 	instructions := c.FormValue("instructions")
@@ -33,10 +56,12 @@ func SocialPostText(c *fiber.Ctx) error {
 		panic(err)
 	}
 
+	scrapeResult := util.Scrape_url(systemInstructions.Params.Url)
+
 	gem := util.Gem{}
 	gem.Init()
 	gem.SetModel()
-	sysInstr := gem.CreateSystemStruction(systemInstructions.Params)
+	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, scrapeResult.Description)
 	gem.SetSystemInstructions(sysInstr)
 
 	defer gem.Client.Close()
@@ -45,7 +70,6 @@ func SocialPostText(c *fiber.Ctx) error {
 	if length != "" {
 		lengthInt, err := strconv.Atoi(length)
 		if err != nil {
-			log.Println("Error converting length to integer:", err)
 			return c.Status(fiber.StatusBadRequest).JSON("Invalid length")
 		}
 
@@ -74,24 +98,20 @@ func SocialPostText(c *fiber.Ctx) error {
 
 	// generate parts
 	parts := gem.SendRequest(ctx, systemInstructions.Prompt)
-
-	log.Println(parts)
+	promotions := CaptionStruct(parts)
 
 	// Dark Forest Part
 	bf := util.BlackForest{}
 	bf.Init()
-	bf.SetPrompt(partsToStrings(parts))
-
+	//
 	var samples []string
 
-	for j := 0; j < 3; j++ {
+	for _, promotion := range promotions {
+		bf.SetPrompt(promotion.Caption)
 		id := bf.Request()
 		sample := bf.Poll(id)
 		samples = append(samples, sample)
-
 	}
-	// log.Println(id)
-	// sample := bf.Poll(id)
 
 	result := map[string]interface{}{
 		"result":  parts,

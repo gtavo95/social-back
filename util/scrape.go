@@ -3,9 +3,10 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
+	"social/model"
 )
 
 func encode_url(baseURL string) string {
@@ -22,7 +23,7 @@ func encode_url(baseURL string) string {
 
 }
 
-func scrape_url(baseURL string) interface{} {
+func Scrape_url(baseURL string) model.ScrapeResult {
 
 	// Create client
 	client := &http.Client{}
@@ -47,7 +48,7 @@ func scrape_url(baseURL string) interface{} {
 	}
 
 	// Read Response Body
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 
 	// Unmarshal the JSON response
 	var responseData map[string]interface{}
@@ -99,12 +100,17 @@ func scrape_url(baseURL string) interface{} {
 		}
 	}
 
-	response := map[string]interface{}{
-		"description": description,
-		"logo":        logo,
+	// response := map[string]interface{}{
+	// 	"description": description,
+	// 	"logo":        logo,
+	// }
+
+	result := model.ScrapeResult{
+		Description: description,
+		Logo:        logo,
 	}
 
 	// Send the response as JSON
-	return response
+	return result
 
 }

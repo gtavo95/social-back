@@ -8,9 +8,15 @@ type Params struct {
 	Network  string `json:"network"`
 	Context  bool   `json:"context"`
 	Post     string `json:"posts"`
+	Url      string `json:"url"`
 }
 
 type SystemInstructions struct {
 	Prompt string `json:"prompt"`
 	Params Params `json:"params"`
+}
+
+type ScrapeResult struct {
+	Description string `json:"description"`
+	Logo        string `json:"logo"`
 }

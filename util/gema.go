@@ -1,12 +1,16 @@
 package util
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"social/model"
+	"strings"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
@@ -21,13 +25,7 @@ type Gem struct {
 func (g *Gem) Init() {
 	ctx := context.Background()
 
-	// apiKey, ok := os.LookupEnv("GEMINI_API_KEY")
 	apiKey := os.Getenv("GEMINI_API_KEY")
-	log.Println("apikey", apiKey)
-
-	// if !ok {
-	// 	log.Fatalln("Environment variable GEMINI_API_KEY not set")
-	// }
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
@@ -63,11 +61,10 @@ func (g *Gem) SetModel() {
 			Threshold: genai.HarmBlockNone,
 		},
 	}
-	// g.Model.ResponseMIMEType = "text/plain"
 
 }
 
-func (g *Gem) CreateSystemStruction(params model.Params) string {
+func (g *Gem) CreateSystemStruction(params model.Params, identity string) string {
 
 	withHashtags := "no"
 	if params.Hashtags {
@@ -81,13 +78,12 @@ func (g *Gem) CreateSystemStruction(params model.Params) string {
 
 	withContext := ""
 	if params.Context {
-		withContext = "To do this, you have in I have upload files about the identity of the company and the context of the brand"
+		withContext = "To do this, use the identity of the company and the context of the brand" + identity
 	}
 
 	instruction := fmt.Sprintf("You are a creative assistant, who seeks to guide and help a marketer to create content on %s. Generate markdown instruction with exactly %d words, including %s hashtags and %s relevant emojis. Ensure the tone is %s. %s. Provide %s options. The answer in Json format [{caption: '', caption: '', ...}]",
 		params.Network, params.Words, withHashtags, withEmojis, params.Tone, withContext, params.Post)
 
-	log.Println(instruction)
 	return instruction
 }
 
@@ -122,6 +118,7 @@ func (g *Gem) SetSession(parts []genai.Part) {
 	}
 
 }
+
 func (g *Gem) SetSessionSimple() {
 	session := g.Model.StartChat()
 	g.Session = session
@@ -129,16 +126,35 @@ func (g *Gem) SetSessionSimple() {
 
 }
 
+func (g *Gem) UploadImageFromURL(imgURL string) genai.Blob {
+	response, err := http.Get(imgURL)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, response.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	parts := strings.Split(imgURL, ".")
+	imgType := parts[len(parts)-1]
+
+	genaiImgData := genai.ImageData(imgType, buf.Bytes())
+	return genaiImgData
+
+}
+
 func (g *Gem) SendRequest(ctx context.Context, prompt string) []genai.Part {
-	log.Println("prompt", prompt)
 	resp, err := g.Session.SendMessage(ctx, genai.Text(prompt))
 	if err != nil {
 		log.Println("Error sending message", err)
 		panic(err)
 	}
-	log.Println("resp", resp)
-	for _, part := range resp.Candidates[0].Content.Parts {
-		fmt.Printf("%v\n", part)
-	}
+	// for _, part := range resp.Candidates[0].Content.Parts {
+	// 	fmt.Printf("%v\n", part)
+	// }
 	return resp.Candidates[0].Content.Parts
 }
