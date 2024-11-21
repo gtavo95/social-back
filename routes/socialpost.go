@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"social/model"
 	"social/util"
 	"strconv"
@@ -61,6 +62,7 @@ func SocialPostText(c *fiber.Ctx) error {
 	gem := util.Gem{}
 	gem.Init()
 	gem.SetModel()
+	log.Println("scrapeResult", scrapeResult)
 	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, scrapeResult.Description)
 	gem.SetSystemInstructions(sysInstr)
 
@@ -106,8 +108,9 @@ func SocialPostText(c *fiber.Ctx) error {
 	//
 	var samples []string
 
+	log.Println("sysInstr", sysInstr)
 	for _, promotion := range promotions {
-		bf.SetPrompt(promotion.Caption)
+		bf.SetPrompt(promotion.Caption, sysInstr)
 		id := bf.Request()
 		sample := bf.Poll(id)
 		samples = append(samples, sample)

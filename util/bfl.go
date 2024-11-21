@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -33,11 +32,11 @@ func (bf *BlackForest) Init() {
 
 }
 
-func (bf *BlackForest) SetPrompt(prompt string) {
+func (bf *BlackForest) SetPrompt(prompt string, reference string) {
 	// Define the request payload
 	bf.Prompt = map[string]interface{}{
 		// "prompt": "A cat on its back legs running like a human is holding a big silver fish with its arms. The cat is running away from the shop owner and has a panicked look on his face. The scene is situated in a crowded market.",
-		"prompt": "You are a creative assistant, who seeks to guide and help a marketer to create content on social media, create an image for the next prompt" + prompt,
+		"prompt": prompt + " " + reference + " Do not include text on the image",
 		"width":  1024,
 		"height": 768,
 	}
@@ -72,13 +71,13 @@ func (bf *BlackForest) Request() string {
 	defer resp.Body.Close()
 
 	// Read the response
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Error reading response body: %v", err)
 	}
 
 	// Print the response
-	fmt.Println("Response:", string(body))
+	// fmt.Println("Response:", string(body))
 
 	// Extract request_id using jq-like functionality in Go
 	var result map[string]interface{}
@@ -88,9 +87,9 @@ func (bf *BlackForest) Request() string {
 		panic(err)
 	}
 
-	fmt.Printf("Request ID: %v\n", result["id"])
+	// fmt.Printf("Request ID: %v\n", result["id"])
 	requestID, ok := result["id"].(string)
-	fmt.Printf("Request ID: %v\n", requestID)
+	// fmt.Printf("Request ID: %v\n", requestID)
 	if !ok {
 		log.Fatalf("Error: 'id' field is not a string or is missing")
 	}

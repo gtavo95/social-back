@@ -35,6 +35,10 @@ func Scrape_url(baseURL string) model.ScrapeResult {
 	// Create request
 	req, err := http.NewRequest("GET", "https://app.scrapingbee.com/api/v1/?api_key=CLDW8SV4VVM4AFW82355BQ9PV8AZSR3G33ZQ2BTQFO8QIAPZEVJRKWDOLNGNRLJBCMEVLZG8Z32HC4LR&url="+encoded_url+"&json_response=true", nil)
 
+	if err != nil {
+		panic(err)
+	}
+
 	parseFormErr := req.ParseForm()
 	if parseFormErr != nil {
 		fmt.Println(parseFormErr)
@@ -49,6 +53,10 @@ func Scrape_url(baseURL string) model.ScrapeResult {
 
 	// Read Response Body
 	respBody, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		panic(err)
+	}
 
 	// Unmarshal the JSON response
 	var responseData map[string]interface{}
