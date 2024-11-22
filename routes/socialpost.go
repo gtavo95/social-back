@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"social/model"
 	"social/util"
 	"strconv"
@@ -59,11 +60,32 @@ func SocialPostText(c *fiber.Ctx) error {
 
 	scrapeResult := util.Scrape_url(systemInstructions.Params.Url)
 
+	//Nuevo codigo
+
+	description := scrapeResult.Description
+	logo := scrapeResult.Logo
+	target_url := systemInstructions.Params.Url
+
+	if description == "" && logo == "" {
+
+		parsedURL, err := url.Parse(target_url)
+		if err != nil {
+			log.Println("Error parseando URL", target_url)
+		}
+
+		// Rebuild the URL with only the scheme and host
+		target_url = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+		log.Println("New URL", target_url)
+
+		scrapeResult = util.Scrape_url(target_url)
+
+	}
+
 	gem := util.Gem{}
 	gem.Init()
 	gem.SetModel()
 	log.Println("scrapeResult", scrapeResult)
-	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, scrapeResult.Description)
+	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, description)
 	gem.SetSystemInstructions(sysInstr)
 
 	defer gem.Client.Close()
