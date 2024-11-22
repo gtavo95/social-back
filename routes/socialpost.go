@@ -79,6 +79,9 @@ func SocialPostText(c *fiber.Ctx) error {
 
 		scrapeResult = util.Scrape_url(target_url)
 
+		description = scrapeResult.Description
+		logo = scrapeResult.Logo
+
 	}
 
 	gem := util.Gem{}
