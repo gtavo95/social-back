@@ -32,11 +32,11 @@ func (bf *BlackForest) Init() {
 
 }
 
-func (bf *BlackForest) SetPrompt(prompt string, reference string) {
+func (bf *BlackForest) SetPrompt(identity string) {
 	// Define the request payload
 	bf.Prompt = map[string]interface{}{
 		// "prompt": "A cat on its back legs running like a human is holding a big silver fish with its arms. The cat is running away from the shop owner and has a panicked look on his face. The scene is situated in a crowded market.",
-		"prompt": reference + "No text",
+		"prompt": identity + "A visually striking representation of [brand industry or theme], designed in a [visual style] aesthetic with [colors and mood]. The image embodies [the essence of the caption, e.g., innovation, relaxation, adventure, etc.]. Include [key elements or details] to reflect the brand's identity. The composition is clean and professional, suitable for [target audience or platform]. No text.",
 		"width":  1024,
 		"height": 768,
 	}

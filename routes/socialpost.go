@@ -110,7 +110,7 @@ func SocialPostText(c *fiber.Ctx) error {
 
 	log.Println("sysInstr", sysInstr)
 	for _, promotion := range promotions {
-		bf.SetPrompt(promotion.Caption, sysInstr)
+		bf.SetPrompt(promotion.Caption)
 		id := bf.Request()
 		sample := bf.Poll(id)
 		samples = append(samples, sample)
