@@ -11,9 +11,16 @@ type Params struct {
 	Url      string `json:"url"`
 }
 
+type Meeting struct {
+	Link      string `json:"link"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+}
+
 type SystemInstructions struct {
-	Prompt string `json:"prompt"`
-	Params Params `json:"params"`
+	Prompt  string  `json:"prompt"`
+	Params  Params  `json:"params"`
+	Meeting Meeting `json:"meeting"`
 }
 
 type ScrapeResult struct {
