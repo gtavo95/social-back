@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"social/model"
@@ -108,19 +107,19 @@ func (g *Gem) SetSystemInstructions(instruction string) {
 	}
 }
 
-func (g *Gem) UploadToGemini(ctx context.Context, file multipart.File, name, mimeType string) string {
-
-	options := genai.UploadFileOptions{
-		DisplayName: name,
-		MIMEType:    mimeType,
-	}
-	fileData, err := g.Client.UploadFile(ctx, "", file, &options)
-	if err != nil {
-		log.Fatalf("Error uploading file: %v", err)
-	}
-
-	return fileData.URI
-}
+// func (g *Gem) UploadToGemini(ctx context.Context, file multipart.File, name, mimeType string) string {
+//
+// 	options := genai.UploadFileOptions{
+// 		DisplayName: name,
+// 		MIMEType:    mimeType,
+// 	}
+// 	fileData, err := g.Client.UploadFile(ctx, "", file, &options)
+// 	if err != nil {
+// 		log.Fatalf("Error uploading file: %v", err)
+// 	}
+//
+// 	return fileData.URI
+// }
 
 func (g *Gem) SetSession(parts []genai.Part) {
 	session := g.Model.StartChat()
