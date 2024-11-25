@@ -48,7 +48,7 @@ func CaptionStruct(data []genai.Part) []Promotion {
 func SocialPostText(c *fiber.Ctx) error {
 
 	instructions := c.FormValue("instructions")
-	length := c.FormValue("length")
+	// length := c.FormValue("length")
 
 	var systemInstructions model.SystemInstructions
 	err := json.Unmarshal([]byte(instructions), &systemInstructions)
