@@ -162,9 +162,10 @@ func (g *Gem) UploadImageFromURL(imgURL string) genai.Blob {
 }
 
 func (g *Gem) SendRequest(ctx context.Context, prompt string) []genai.Part {
+	log.Println(prompt)
 	resp, err := g.Session.SendMessage(ctx, genai.Text(prompt))
 	if err != nil {
-		log.Println("Error sending message", err)
+		log.Println("Error sending message", err.Error())
 		panic(err)
 	}
 	// for _, part := range resp.Candidates[0].Content.Parts {
