@@ -136,7 +136,6 @@ func Scrape_url(baseURL string) model.ScrapeResult {
 	}
 
 	/*
-
 		if metadata, ok := responseData["metadata"].(map[string]interface{}); ok {
 
 			// Check if "opengraph" exists and is a non-empty list
