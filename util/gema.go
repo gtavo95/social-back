@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"social/model"
@@ -68,12 +67,12 @@ func (g *Gem) CreateSystemStruction(params model.Params, identity string) string
 
 	withHashtags := "no"
 	if params.Hashtags {
-		withHashtags = "yes"
+		withHashtags = ""
 	}
 
 	withEmojis := "no"
 	if params.Emojis {
-		withEmojis = "yes"
+		withEmojis = ""
 	}
 
 	withContext := ""
@@ -81,8 +80,23 @@ func (g *Gem) CreateSystemStruction(params model.Params, identity string) string
 		withContext = "To do this, use the identity of the company and the context of the brand" + identity
 	}
 
-	instruction := fmt.Sprintf("You are a creative assistant, who seeks to guide and help a marketer to create content on %s. Generate markdown instruction with exactly %d words, including %s hashtags and %s relevant emojis. Ensure the tone is %s. %s. Provide %s options. The answer in Json format [{caption: '', caption: '', ...}]. include the next url in the caption text http://localhost:3000/honey/90140547",
-		params.Network, params.Words, withHashtags, withEmojis, params.Tone, withContext, params.Post)
+	instruction := fmt.Sprintf(`You are a creative assistant guiding a marketer to create content about %s. For %s.
+		Task Details:
+		Generate markdown instructions with exactly %d words.
+		Include %s hashtags (at the end of the caption).
+		Add %s relevant emojis spread throughout the content.
+		Ensure the tone is %s.
+		Provide %s options of captions.
+		Mandatory Details:
+		Include the URL: http://localhost:3000/honey/90140547.
+		Add the meeting date and time: Use the current time + 30 minutes, in this format: MonthName/Day HH:MM.
+		Use formatting for clarity: Ensure captions have line breaks and spaces to enhance readability.
+		Generate captions in JSON format as follows: 
+		[[ 
+		  { \"caption\": \" Title in markdown\nA brief description in *markdown* format.\" },
+		  { \"caption\": \" Another title\nAdditional details in **markdown**.\" } 
+		]]. Ensure all text have proper formats, add bolds and enters where is necessary.`,
+		withContext, params.Network, params.Words, withHashtags, withEmojis, params.Tone, params.Post)
 
 	return instruction
 }
@@ -93,19 +107,19 @@ func (g *Gem) SetSystemInstructions(instruction string) {
 	}
 }
 
-func (g *Gem) UploadToGemini(ctx context.Context, file multipart.File, name, mimeType string) string {
-
-	options := genai.UploadFileOptions{
-		DisplayName: name,
-		MIMEType:    mimeType,
-	}
-	fileData, err := g.Client.UploadFile(ctx, "", file, &options)
-	if err != nil {
-		log.Fatalf("Error uploading file: %v", err)
-	}
-
-	return fileData.URI
-}
+// func (g *Gem) UploadToGemini(ctx context.Context, file multipart.File, name, mimeType string) string {
+//
+// 	options := genai.UploadFileOptions{
+// 		DisplayName: name,
+// 		MIMEType:    mimeType,
+// 	}
+// 	fileData, err := g.Client.UploadFile(ctx, "", file, &options)
+// 	if err != nil {
+// 		log.Fatalf("Error uploading file: %v", err)
+// 	}
+//
+// 	return fileData.URI
+// }
 
 func (g *Gem) SetSession(parts []genai.Part) {
 	session := g.Model.StartChat()
@@ -148,9 +162,10 @@ func (g *Gem) UploadImageFromURL(imgURL string) genai.Blob {
 }
 
 func (g *Gem) SendRequest(ctx context.Context, prompt string) []genai.Part {
+	log.Println(prompt)
 	resp, err := g.Session.SendMessage(ctx, genai.Text(prompt))
 	if err != nil {
-		log.Println("Error sending message", err)
+		log.Println("Error sending message", err.Error())
 		panic(err)
 	}
 	// for _, part := range resp.Candidates[0].Content.Parts {

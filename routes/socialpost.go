@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"social/model"
 	"social/util"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/generative-ai-go/genai"
@@ -50,7 +49,7 @@ func CaptionStruct(data []genai.Part) []Promotion {
 func SocialPostText(c *fiber.Ctx) error {
 
 	instructions := c.FormValue("instructions")
-	length := c.FormValue("length")
+	// length := c.FormValue("length")
 
 	var systemInstructions model.SystemInstructions
 	err := json.Unmarshal([]byte(instructions), &systemInstructions)
@@ -94,35 +93,9 @@ func SocialPostText(c *fiber.Ctx) error {
 	defer gem.Client.Close()
 
 	ctx := context.Background()
-	if length != "" {
-		lengthInt, err := strconv.Atoi(length)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON("Invalid length")
-		}
+	gem.SetSessionSimple()
 
-		var genPars []genai.Part
-
-		for i := 0; i < lengthInt; i++ {
-			file, err := c.FormFile("file" + strconv.Itoa(i+1))
-
-			if err != nil {
-				panic(err)
-			}
-
-			f, err := file.Open()
-			if err != nil {
-				panic(err)
-			}
-			uri := gem.UploadToGemini(ctx, f, file.Filename, "application/pdf")
-			genPars = append(genPars, genai.FileData{URI: uri})
-
-		}
-		gem.SetSession(genPars)
-	} else {
-		gem.SetSessionSimple()
-
-	}
-
+	log.Println("start request")
 	// generate parts
 	parts := gem.SendRequest(ctx, systemInstructions.Prompt)
 	promotions := CaptionStruct(parts)
@@ -135,7 +108,7 @@ func SocialPostText(c *fiber.Ctx) error {
 
 	log.Println("sysInstr", sysInstr)
 	for _, promotion := range promotions {
-		bf.SetPrompt(promotion.Caption, sysInstr)
+		bf.SetPrompt(promotion.Caption)
 		id := bf.Request()
 		sample := bf.Poll(id)
 		samples = append(samples, sample)

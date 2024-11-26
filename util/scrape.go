@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"social/model"
@@ -52,7 +52,7 @@ func Scrape_url(baseURL string) model.ScrapeResult {
 	}
 
 	// Read Response Body
-	respBody, err := io.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
 		panic(err)
