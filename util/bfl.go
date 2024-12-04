@@ -87,6 +87,7 @@ func (bf *BlackForest) Request() string {
 		panic(err)
 	}
 
+	log.Println("result", result)
 	// fmt.Printf("Request ID: %v\n", result["id"])
 	requestID, ok := result["id"].(string)
 	// fmt.Printf("Request ID: %v\n", requestID)
