@@ -115,6 +115,8 @@ func SocialPostText(c *fiber.Ctx) error {
 		samples = append(samples, sample)
 	}
 
+	log.Println("parts", parts)
+
 	result := map[string]interface{}{
 		"result":  parts,
 		"samples": samples,

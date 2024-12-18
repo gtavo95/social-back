@@ -91,11 +91,12 @@ func (g *Gem) CreateSystemStruction(params model.Params, meeting model.Meeting, 
 		Include the URL: %s.
 		Add the meeting date and time: Use the %s as the start time and %s as the end time, in this format: MonthName/Day HH:MM.
 		Use formatting for clarity: Ensure captions have line breaks and spaces to enhance readability.
+		Ensure all text have proper formats, add bolds and enters where is necessary.
 		Generate captions in JSON format as follows: 
 		[[ 
 		  { \"caption\": \" Title in markdown\nA brief description in *markdown* format.\" },
 		  { \"caption\": \" Another title\nAdditional details in **markdown**.\" } 
-		]]. Ensure all text have proper formats, add bolds and enters where is necessary.`,
+		]]. `,
 		withContext, params.Network, params.Words, withHashtags, withEmojis, params.Tone, meeting.Link, meeting.StartTime, meeting.EndTime, params.Post)
 
 	return instruction
