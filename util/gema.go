@@ -63,7 +63,7 @@ func (g *Gem) SetModel() {
 
 }
 
-func (g *Gem) CreateSystemStruction(params model.Params, identity string) string {
+func (g *Gem) CreateSystemStruction(params model.Params, meeting model.Meeting, identity string) string {
 
 	withHashtags := "no"
 	if params.Hashtags {
@@ -88,15 +88,15 @@ func (g *Gem) CreateSystemStruction(params model.Params, identity string) string
 		Ensure the tone is %s.
 		Provide %s options of captions.
 		Mandatory Details:
-		Include the URL: http://localhost:3000/honey/90140547.
-		Add the meeting date and time: Use the current time + 30 minutes, in this format: MonthName/Day HH:MM.
+		Include the URL: %s.
+		Add the meeting date and time: Use the %s as the start time and %s as the end time, in this format: MonthName/Day HH:MM.
 		Use formatting for clarity: Ensure captions have line breaks and spaces to enhance readability.
 		Generate captions in JSON format as follows: 
 		[[ 
 		  { \"caption\": \" Title in markdown\nA brief description in *markdown* format.\" },
 		  { \"caption\": \" Another title\nAdditional details in **markdown**.\" } 
 		]]. Ensure all text have proper formats, add bolds and enters where is necessary.`,
-		withContext, params.Network, params.Words, withHashtags, withEmojis, params.Tone, params.Post)
+		withContext, params.Network, params.Words, withHashtags, withEmojis, params.Tone, meeting.Link, meeting.StartTime, meeting.EndTime, params.Post)
 
 	return instruction
 }

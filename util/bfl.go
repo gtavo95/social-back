@@ -40,7 +40,6 @@ func (bf *BlackForest) SetPrompt(identity string) {
 		"width":  1024,
 		"height": 768,
 	}
-
 }
 
 func (bf *BlackForest) Request() string {

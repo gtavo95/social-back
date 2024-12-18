@@ -15,9 +15,12 @@ func main() {
 	// Load the .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Error loading .env file")
+		log.Fatal("Error loading .env file:", err)
 	}
-	app := fiber.New(fiber.Config{DisablePreParseMultipartForm: true, StreamRequestBody: true})
+	app := fiber.New(fiber.Config{
+		DisablePreParseMultipartForm: true,
+		StreamRequestBody:            true,
+	})
 
 	app.Use(logger.New())
 	app.Use(recover.New())

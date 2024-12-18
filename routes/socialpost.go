@@ -29,6 +29,9 @@ type Promotion struct {
 
 func CaptionStruct(data []genai.Part) []Promotion {
 	// Variable to hold the parsed data
+
+	log.Println("data", data)
+
 	var promotions []Promotion
 
 	var captions string
@@ -49,7 +52,6 @@ func CaptionStruct(data []genai.Part) []Promotion {
 func SocialPostText(c *fiber.Ctx) error {
 
 	instructions := c.FormValue("instructions")
-	// length := c.FormValue("length")
 
 	var systemInstructions model.SystemInstructions
 	err := json.Unmarshal([]byte(instructions), &systemInstructions)
@@ -60,7 +62,6 @@ func SocialPostText(c *fiber.Ctx) error {
 	scrapeResult := util.Scrape_url(systemInstructions.Params.Url)
 
 	//Nuevo codigo
-
 	description := scrapeResult.Description
 	logo := scrapeResult.Logo
 	target_url := systemInstructions.Params.Url
@@ -87,7 +88,7 @@ func SocialPostText(c *fiber.Ctx) error {
 	gem.Init()
 	gem.SetModel()
 	log.Println("scrapeResult", scrapeResult)
-	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, description)
+	sysInstr := gem.CreateSystemStruction(systemInstructions.Params, systemInstructions.Meeting, description)
 	gem.SetSystemInstructions(sysInstr)
 
 	defer gem.Client.Close()
